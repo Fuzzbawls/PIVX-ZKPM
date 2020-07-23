@@ -1,3 +1,5 @@
 /.project
 *.pyc
 /.idea/*
+/build/*
+/ZkParamsWizard-v*
