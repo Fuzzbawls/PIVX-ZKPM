@@ -80,7 +80,6 @@ else:
 class Downloader(QObject):
     # filename progress percent
     download_progress = pyqtSignal(str, int)
-    download_complete = pyqtSignal()
 
     def __init__(self, dest_dir, *args, **kwargs):
         QObject.__init__(self, *args, **kwargs)
@@ -155,5 +154,3 @@ class Downloader(QObject):
             else:
                 logging.warning("%s does not exist and will now be downloaded...", self.dest_dir + key)
                 self.download_file(key)
-
-        self.download_complete.emit()

@@ -106,11 +106,11 @@ class MainWidget(QWidget):
         init_logs(self.destination)
         downloader = Downloader(self.destination)
         downloader.download_progress.connect(self.updateProgressPercent)
-        downloader.download_complete.connect(self.showCompleted)
         if check:
             downloader.check_params()
         else:
             downloader.get_params()
+        self.showCompleted()
 
     # Activated by signal download_progress from downloader
     def updateProgressPercent(self, key, percent):
@@ -119,7 +119,6 @@ class MainWidget(QWidget):
             self.layout.addWidget(self.paramline[key])
         self.paramline[key].updateProgressPercent(percent)
 
-    # Activated by signal download_complete from downloader
     def showCompleted(self):
         for key in self.paramline:
             self.paramline[key].hide()

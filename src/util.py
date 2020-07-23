@@ -12,13 +12,11 @@ import platform
 HOST_OS = platform.system()
 
 def get_default_destination_dir():
-    dest_dir = 	os.path.expanduser('~')
-    if HOST_OS == 'Windows':
-        dest_dir += "\\AppData\\Roaming\\ZcashParams\\"
-    elif HOST_OS == 'Linux':
-        dest_dir += r"/.zcash-params/"
-    elif HOST_OS == 'Darwin':
-        dest_dir += r"/Library/Application Support/ZcashParams/"
+    dest_dir = os.path.expanduser('~')
+    if HOST_OS == 'Linux':
+        dest_dir = os.path.join(dest_dir, ".pivx-params")
+    elif HOST_OS == 'Windows' or HOST_OS == 'Darwin':
+        dest_dir = os.path.join(dest_dir, "PIVXParams")
     else:
         raise Exception(" %s is not currently supported.", HOST_OS)
     return dest_dir
