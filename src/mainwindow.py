@@ -65,6 +65,7 @@ class MainWidget(QWidget):
         self.parent = parent
         super(QWidget, self).__init__(parent)
         self.destination = get_default_destination_dir()
+        self.paramline = {}
         self.initUI()
         # connect buttons
         self.btn_download.clicked.connect(self.onDownload)
@@ -78,25 +79,27 @@ class MainWidget(QWidget):
         row1.addWidget(QLabel("Save in: "))
         self.led_destination = QLineEdit()
         self.led_destination.setDisabled(True)
-        self.led_destination.setPlaceholderText(self.destination)
+        self.led_destination.setText(self.destination)
         self.led_destination.setMinimumWidth(300)
         self.led_destination.setAlignment(Qt.AlignHCenter)
+        self.led_destination.setFont(QFont('Consolas', 9))
         row1.addWidget(self.led_destination)
-        self.btn_destination = QPushButton("Select...")
+        self.btn_destination = QPushButton("Change...")
         row1.addWidget(self.btn_destination)
-        row1_wid = QWidget()
-        row1_wid.setLayout(row1)
-        self.layout.addWidget(row1_wid)
+        self.layout.addLayout(row1)
         self.btn_download = QPushButton("Download")
-        self.layout.addWidget(self.btn_download)
-        self.paramline = {}
+        self.btn_download.setMaximumWidth(120)
+        row2 = QHBoxLayout()
+        row2.setAlignment(Qt.AlignCenter)
+        row2.addWidget(self.btn_download)
+        self.layout.addLayout(row2)
         self.setLayout(self.layout)
 
     def onChangeDestination(self):
         selected_dir = str(QFileDialog.getExistingDirectory(self, "Select Directory", self.destination))
         if selected_dir != "":
             self.destination = selected_dir
-            self.led_destination.setPlaceholderText(self.destination)
+            self.led_destination.setText(self.destination)
 
     def onDownload(self):
         check = True
@@ -131,8 +134,12 @@ class MainWidget(QWidget):
         lbl_finished.setStyleSheet("color: green")
         self.layout.addWidget(lbl_finished)
         self.btn_close = QPushButton("Close")
+        self.btn_close.setMaximumWidth(120)
+        row = QHBoxLayout()
+        row.setAlignment(Qt.AlignCenter)
+        row.addWidget(self.btn_close)
+        self.layout.addLayout(row)
         self.btn_close.clicked.connect(lambda: self.parent.close())
-        self.layout.addWidget(self.btn_close)
 
 
 

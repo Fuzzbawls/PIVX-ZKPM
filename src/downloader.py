@@ -86,7 +86,7 @@ class Downloader(QObject):
         self.dest_dir = dest_dir
 
     def use_https(self, filename):
-        path = self.dest_dir + filename + ".dl"
+        path = os.path.join(self.dest_dir, filename + ".dl")
         response = requests.get(PARAMS_URL + filename, stream=True)
         size = 0
         total_size = int(response.headers['Content-Length'])
@@ -112,13 +112,14 @@ class Downloader(QObject):
         logging.info(" '%s' saved [%d/%d]", filename, size, total_size)
 
         if size == total_size:
-            self.verify_file(path, PARAMS[filename]["sha256"], DOWNLOADING)
+            self.verify_param_file(filename, DOWNLOADING)
 
-    def download_file(self, filename):
+    def download_param_file(self, filename):
         # only HTTPS for now
         self.use_https(filename)
 
-    def verify_file(self, path, sha256, download_state):
+    def verify_param_file(self, filename, download_state):
+        path = os.path.join(self.dest_dir, filename + ".dl")
         logging.info("Checking SHA256 for: %s", path)
         with open(path, 'rb') as f:
             try:
@@ -126,8 +127,7 @@ class Downloader(QObject):
             except:
                 logging.exception("Unable to read in data blocks to verify SHA256 for: %s", path)
 
-            local_sha256 = hashlib.sha256(contents).hexdigest()
-            if local_sha256 != sha256:
+            if hashlib.sha256(contents).hexdigest() != PARAMS[filename]["sha256"]:
                 logging.error("Download failed: SHA256 on %s does NOT match.", path)
                 return
 
@@ -144,13 +144,13 @@ class Downloader(QObject):
 
     def get_params(self):
         for key in PARAMS:
-            self.download_file(key)
+            self.download_param_file(key)
 
     def check_params(self):
         for key in PARAMS:
-            if os.path.exists(self.dest_dir + key):
-                self.verify_file(self.dest_dir + key, PARAMS[key]["sha256"], DOWNLOADED)
+            if os.path.exists(os.path.join(self.dest_dir, key)):
+                self.verify_param_file(key, DOWNLOADED)
                 self.download_progress.emit(key, 100)
             else:
-                logging.warning("%s does not exist and will now be downloaded...", self.dest_dir + key)
-                self.download_file(key)
+                logging.warning("%s does not exist and will now be downloaded...", str(os.path.join(self.dest_dir, key)))
+                self.download_param_file(key)
