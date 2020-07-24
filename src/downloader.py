@@ -10,7 +10,7 @@ import os
 import requests
 from tqdm import tqdm
 
-from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject
 
 from util import HOST_OS
 
@@ -148,11 +148,15 @@ class Downloader(QObject):
 
             self.file_verified.emit(filename)
 
+    @pyqtSlot()
     def get_params(self):
+        print("In get params")
         for key in PARAMS:
             self.download_param_file(key)
 
+    @pyqtSlot()
     def check_params(self):
+        print("In check params")
         for key in PARAMS:
             if os.path.exists(os.path.join(self.dest_dir, key)):
                 self.download_progress.emit(key, 100)

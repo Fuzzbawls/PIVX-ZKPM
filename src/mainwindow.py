@@ -6,7 +6,7 @@
 
 import os
 import signal
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QThread
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (
     QApplication,
@@ -21,7 +21,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from downloader import Downloader
+from downloader import Downloader, PARAMS
 from util import get_default_destination_dir, init_logs
 
 class ServiceExit(Exception):
@@ -52,11 +52,11 @@ class ParamLine(QWidget):
 
     def updateProgressPercent(self, percent):
         self.bar.setValue(percent)
-        QApplication.processEvents()
+        #QApplication.processEvents()
 
     def updateFileVerified(self):
         self.lbl.setStyleSheet("color: green")
-        QApplication.processEvents()
+        #QApplication.processEvents()
 
 
 
@@ -134,14 +134,16 @@ class MainWidget(QWidget):
             check = False
             os.makedirs(self.destination)
         init_logs(self.destination)
-        downloader = Downloader(self.destination)
-        downloader.download_progress.connect(self.updateProgressPercent)
-        downloader.file_verified.connect(self.updateFileVerified)
+        self.downloader_thread = QThread()
+        self.downloader = Downloader(self.destination)
+        self.downloader.moveToThread(self.downloader_thread)
+        self.downloader.download_progress.connect(self.updateProgressPercent)
+        self.downloader.file_verified.connect(self.updateFileVerified)
         if check:
-            downloader.check_params()
+            self.downloader_thread.started.connect(self.downloader.check_params)
         else:
-            downloader.get_params()
-        self.showCompleted()
+            self.downloader_thread.started.connect(self.downloader.get_params)
+        self.downloader_thread.start()
 
     # Activated by signal download_progress from downloader
     def updateProgressPercent(self, key, percent):
@@ -154,6 +156,8 @@ class MainWidget(QWidget):
     def updateFileVerified(self, key):
         if key in self.paramline:
             self.paramline[key].updateFileVerified()
+        if len(self.paramline) == len(PARAMS):
+            self.showCompleted()
 
     def showCompleted(self):
         self.lbl_intro.hide()
