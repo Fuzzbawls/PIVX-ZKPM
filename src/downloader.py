@@ -80,6 +80,7 @@ else:
 class Downloader(QObject):
     # filename progress percent
     download_progress = pyqtSignal(str, int)
+    file_verified = pyqtSignal(str)
 
     def __init__(self, dest_dir, *args, **kwargs):
         QObject.__init__(self, *args, **kwargs)
@@ -119,7 +120,10 @@ class Downloader(QObject):
         self.use_https(filename)
 
     def verify_param_file(self, filename, download_state):
-        path = os.path.join(self.dest_dir, filename + ".dl")
+        path = os.path.join(self.dest_dir, filename)
+        if download_state == DOWNLOADING:
+            path += ".dl"
+
         logging.info("Checking SHA256 for: %s", path)
         with open(path, 'rb') as f:
             try:
@@ -142,6 +146,8 @@ class Downloader(QObject):
             if download_state == DOWNLOADED:
                 logging.info("%s: OK", path)
 
+            self.file_verified.emit(filename)
+
     def get_params(self):
         for key in PARAMS:
             self.download_param_file(key)
@@ -149,8 +155,8 @@ class Downloader(QObject):
     def check_params(self):
         for key in PARAMS:
             if os.path.exists(os.path.join(self.dest_dir, key)):
-                self.verify_param_file(key, DOWNLOADED)
                 self.download_progress.emit(key, 100)
+                self.verify_param_file(key, DOWNLOADED)
             else:
                 logging.warning("%s does not exist and will now be downloaded...", str(os.path.join(self.dest_dir, key)))
                 self.download_param_file(key)

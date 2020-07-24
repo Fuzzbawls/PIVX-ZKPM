@@ -36,10 +36,11 @@ class ParamLine(QWidget):
         super(QWidget, self).__init__(parent)
         layout = QHBoxLayout()
         layout.setSpacing(4)
-        layout.setContentsMargins(15, 0, 15, 0)
-        lbl = QLabel(label[:-7])     # remove ending '.params' from filename
-        lbl.setFont(QFont('Consolas', 10))
-        layout.addWidget(lbl)
+        layout.setContentsMargins(35, 0, 35, 0)
+        self.lbl = QLabel(label[:-7])     # remove ending '.params' from filename
+        self.lbl.setFont(QFont('Consolas', 10))
+        self.lbl.setMinimumWidth(200)
+        layout.addWidget(self.lbl)
         layout.addStretch()
         self.bar = QProgressBar()
         self.bar.setMinimumWidth(250)
@@ -51,6 +52,10 @@ class ParamLine(QWidget):
 
     def updateProgressPercent(self, percent):
         self.bar.setValue(percent)
+        QApplication.processEvents()
+
+    def updateFileVerified(self):
+        self.lbl.setStyleSheet("color: green")
         QApplication.processEvents()
 
 
@@ -73,26 +78,47 @@ class MainWidget(QWidget):
 
     def initUI(self):
         self.layout = QVBoxLayout()
+        self.layout.setContentsMargins(40, 20, 40, 20)
         self.layout.setSpacing(10)
         self.layout.setAlignment(Qt.AlignTop)
+        rowtop = QHBoxLayout()
+
+        rowtop.setAlignment(Qt.AlignCenter)
+        intro_txt = "This Wizard will download PIVX Zk-SNARK parameters\n"\
+                    "and verify their integrity with sha256sum.\n\n"\
+                    "If they already exist locally,\n"\
+                    "it will only verify their integrity."
+        self.lbl_intro = QLabel(intro_txt)
+        self.lbl_intro.setAlignment(Qt.AlignCenter)
+        rowtop.addWidget(self.lbl_intro)
+        self.layout.addLayout(rowtop)
+        start_layout = QVBoxLayout()
         row1 = QHBoxLayout()
-        row1.addWidget(QLabel("Save in: "))
+        row1.addWidget(QLabel("Save to: "))
         self.led_destination = QLineEdit()
         self.led_destination.setDisabled(True)
         self.led_destination.setText(self.destination)
         self.led_destination.setMinimumWidth(300)
-        self.led_destination.setAlignment(Qt.AlignHCenter)
+        #self.led_destination.setAlignment(Qt.AlignHCenter)
         self.led_destination.setFont(QFont('Consolas', 9))
         row1.addWidget(self.led_destination)
         self.btn_destination = QPushButton("Change...")
+        self.btn_destination.setMaximumWidth(120)
         row1.addWidget(self.btn_destination)
-        self.layout.addLayout(row1)
+        start_layout.addLayout(row1)
         self.btn_download = QPushButton("Download")
-        self.btn_download.setMaximumWidth(120)
+        self.btn_download.setMinimumWidth(200)
         row2 = QHBoxLayout()
         row2.setAlignment(Qt.AlignCenter)
         row2.addWidget(self.btn_download)
-        self.layout.addLayout(row2)
+        start_layout.addLayout(row2)
+        self.start_layout = QWidget()
+        self.start_layout.setLayout(start_layout)
+        self.layout.addWidget(self.start_layout)
+        self.pbar_layout = QVBoxLayout()
+        self.pbar_wdg = QWidget()
+        self.pbar_wdg.setLayout(self.pbar_layout)
+        self.layout.addWidget(self.pbar_wdg)
         self.setLayout(self.layout)
 
     def onChangeDestination(self):
@@ -102,6 +128,7 @@ class MainWidget(QWidget):
             self.led_destination.setText(self.destination)
 
     def onDownload(self):
+        self.start_layout.hide()
         check = True
         if not os.path.exists(self.destination):
             check = False
@@ -109,6 +136,7 @@ class MainWidget(QWidget):
         init_logs(self.destination)
         downloader = Downloader(self.destination)
         downloader.download_progress.connect(self.updateProgressPercent)
+        downloader.file_verified.connect(self.updateFileVerified)
         if check:
             downloader.check_params()
         else:
@@ -119,14 +147,17 @@ class MainWidget(QWidget):
     def updateProgressPercent(self, key, percent):
         if key not in self.paramline:
             self.paramline[key] = ParamLine(self, key)
-            self.layout.addWidget(self.paramline[key])
+            self.pbar_layout.addWidget(self.paramline[key])
         self.paramline[key].updateProgressPercent(percent)
 
+    # Activated by signal file_verified from downloader
+    def updateFileVerified(self, key):
+        if key in self.paramline:
+            self.paramline[key].updateFileVerified()
+
     def showCompleted(self):
-        for key in self.paramline:
-            self.paramline[key].hide()
-        self.btn_download.setDisabled(True)
-        self.btn_destination.setDisabled(True)
+        self.lbl_intro.hide()
+        self.pbar_wdg.hide()
         lbl_finished_txt = "zkSNARK parameters fetched and integrity verified.\n"\
                        "You can now close and delete this application."
         lbl_finished = QLabel(lbl_finished_txt)
