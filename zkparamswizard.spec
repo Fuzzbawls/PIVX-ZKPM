@@ -1,12 +1,25 @@
 # -*- mode: python -*-
 import sys
 import os.path
+import simplejson as json
 
 os_type = sys.platform
 block_cipher = None
 base_dir = os.path.dirname(os.path.realpath('__file__'))
 
-version_str = "0.0.1"  # !TODO: version file
+# look for version string
+version_str = ''
+with open(os.path.join(base_dir, 'src', 'version.txt')) as version_file:
+    version_data = json.load(version_file)
+version_file.close()
+version_str = version_data["number"] + version_data["tag"]
+
+add_files = [('src/version.txt', '.'), ('img', 'img')]
+
+if os_type == 'win32':
+    import ctypes.util
+    import win32con, win32file, pywintypes
+
 app_name = "ZkParamsWizard"
 
 a = Analysis(['zkparamswizard.py'],
@@ -33,7 +46,8 @@ exe = EXE(pyz,
           debug=False,
           strip=False,
           upx=False,
-          console=False)
+          console=False,
+          icon=os.path.join(base_dir, 'img', 'zkpm.%s' % ('icns' if os_type=='darwin' else 'ico')) )
 
 if os_type == 'darwin':
     app = BUNDLE(exe,
@@ -46,11 +60,17 @@ if os_type == 'darwin':
 
 # Prepare bundles
 dist_path = os.path.join(base_dir, 'dist')
-os.chdir(base_dir)
+app_path = os.path.join(dist_path, 'app')
+os.chdir(dist_path)
 
 if os_type == 'win32':
-    dist_path_win = os.path.join(base_dir, app_name + '-v' + version_str + '-Win64')
+    os.chdir(base_dir)
+    # Rename dist Dir
+    dist_path_win = os.path.join(base_dir, 'ZkParamsWizard-v' + version_str + '-Win64')
     os.rename(dist_path, dist_path_win)
+    # Create NSIS compressed installer
+    print('Creating Windows installer (requires NSIS)')
+    os.system('\"c:\\program files (x86)\\NSIS\\makensis.exe\" %s' % os.path.join(base_dir, 'setup.nsi'))
 
 elif os_type == 'linux':
     dist_name = app_name + '-v' + version_str + '-gnu_linux'

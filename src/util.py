@@ -15,7 +15,9 @@ def get_default_destination_dir():
     dest_dir = os.path.expanduser('~')
     if HOST_OS == 'Linux':
         dest_dir = os.path.join(dest_dir, ".pivx-params")
-    elif HOST_OS == 'Windows' or HOST_OS == 'Darwin':
+    elif HOST_OS == 'Windows':
+        dest_dir = os.path.join(os.getenv('APPDATA'), "PIVXParams")
+    elif HOST_OS == 'Darwin':
         dest_dir = os.path.join(dest_dir, "PIVXParams")
     else:
         raise Exception(" %s is not currently supported.", HOST_OS)
