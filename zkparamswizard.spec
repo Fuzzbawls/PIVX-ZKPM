@@ -3,27 +3,28 @@ import sys
 import os.path
 import simplejson as json
 
+app_name = "ZkParamsWizard"
+
 os_type = sys.platform
 block_cipher = None
 base_dir = os.path.dirname(os.path.realpath('__file__'))
 
 # look for version string
 version_str = ''
-with open(os.path.join(base_dir, 'src', 'version.txt')) as version_file:
+with open(os.path.join(base_dir, 'src', app_name, 'version.txt')) as version_file:
     version_data = json.load(version_file)
 version_file.close()
 version_str = version_data["number"] + version_data["tag"]
 
-add_files = [('src/version.txt', '.'), ('img', 'img')]
+add_files = [('src/ZkParamsWizard/version.txt', '.'), ('img', 'img')]
 
 if os_type == 'win32':
     import ctypes.util
     import win32con, win32file, pywintypes
 
-app_name = "ZkParamsWizard"
 
-a = Analysis(['zkparamswizard.py'],
-             pathex=[base_dir, 'src'],
+a = Analysis(['src/ZkParamsWizard/zkparamswizard.py'],
+             pathex=[base_dir, 'src/ZkParamsWizard'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -47,12 +48,12 @@ exe = EXE(pyz,
           strip=False,
           upx=False,
           console=False,
-          icon=os.path.join(base_dir, 'img', 'zkpm.%s' % ('icns' if os_type=='darwin' else 'ico')) )
+          icon=os.path.join(base_dir, 'img', 'zkpw.%s' % ('icns' if os_type=='darwin' else 'ico')) )
 
 if os_type == 'darwin':
     app = BUNDLE(exe,
                  name='%s.app' % app_name,
-                 icon=os.path.join(base_dir, 'img', 'zkpm.icns'),
+                 icon=os.path.join(base_dir, 'img', 'zkpw.icns'),
                  bundle_identifier=None,
                      info_plist={
                         'NSHighResolutionCapable': 'True'

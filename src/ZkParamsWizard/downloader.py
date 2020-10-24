@@ -12,7 +12,10 @@ from tqdm import tqdm
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject
 
-from util import HOST_OS
+try:
+    from .util import HOST_OS
+except ImportError:
+    from util import HOST_OS
 
 PARAMS = {
     "sapling-spend.params" : {

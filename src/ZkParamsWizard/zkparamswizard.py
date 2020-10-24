@@ -4,10 +4,11 @@
 # Distributed under the MIT software license, see the accompanying
 # file LICENSE.txt or http://www.opensource.org/licenses/mit-license.php.
 
-APP_VERSION = "0.0.1"     # !TODO: move to version file
-
 import sys
 import os
+
+APP_VERSION = "0.0.1"     # !TODO: move to version file
+
 
 def set_src_dir():
     if getattr(sys, 'frozen', False):
@@ -22,12 +23,16 @@ def set_src_dir():
         print("Running live")
         sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
 
-if __name__ == '__main__':
+
+def run():
     set_src_dir()
 
     # Create App and main window
     from PyQt5.QtWidgets import QApplication
-    from mainwindow import MainWindow
+    try:
+        from .mainwindow import MainWindow
+    except ImportError:
+        from mainwindow import MainWindow
     app = QApplication(sys.argv)
     ex = MainWindow(app, APP_VERSION)
 
@@ -39,3 +44,7 @@ if __name__ == '__main__':
         print(e)
 
     sys.exit()
+
+
+if __name__ == '__main__':
+    run()

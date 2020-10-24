@@ -4,3 +4,6 @@
 /build/*
 /ZkParamsWizard-v*
 /dist/*
+/parts/*
+/prime/*
+/stage/*

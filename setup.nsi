@@ -1,6 +1,6 @@
 ; Helper defines. PRODUCT_VERSION is parsed by reading src/version.txt.
-!searchparse /file src/version.txt `"number": "` VER_MAJOR `.` VER_MINOR `.` VER_REV `"`
-!searchparse /file src/version.txt `"tag": "` VER_TAG `"`
+!searchparse /file src/ZkParamsWizard/version.txt `"number": "` VER_MAJOR `.` VER_MINOR `.` VER_REV `"`
+!searchparse /file src/ZkParamsWizard/version.txt `"tag": "` VER_TAG `"`
 !define PRODUCT_NAME "ZkParamsWizard"
 !define PRODUCT_VERSION "${VER_MAJOR}.${VER_MINOR}.${VER_REV}${VER_TAG}"
 !define PRODUCT_PUBLISHER "PIVX"
@@ -17,7 +17,7 @@ SetCompressor /SOLID lzma
 
 ; MUI Settings
 !define MUI_ABORTWARNING
-!define MUI_ICON "img\zkpm.ico"
+!define MUI_ICON "img\zkpw.ico"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 
 !insertmacro MUI_PAGE_WELCOME

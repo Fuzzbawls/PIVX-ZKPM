@@ -15,7 +15,8 @@ matrix:
       os: windows
       language: shell
       before_install: wget --progress=dot:mega https://bootstrap.pypa.io/get-pip.py &&
-            choco install python --version 3.7.2 && python get-pip.py && rm get-pip.py && choco install nsis
+            choco install python --version 3.7.2 && python get-pip.py && rm get-pip.py && choco install nsis &&
+            pip3 install --user pywin32 pywin32-ctypes || pip3 install pywin32 pywin32-ctypes
       env: PATH=/c/Python37:/c/Python37/Scripts:/c/Users/travis/AppData/Roaming/Python/Python37/Scripts:$PATH
 install:
   - pip3 install --user -r requirements.txt || pip3 install -r requirements.txt

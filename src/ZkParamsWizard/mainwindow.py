@@ -21,8 +21,12 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from downloader import Downloader, PARAMS
-from util import get_default_destination_dir, init_logs
+try:
+    from .downloader import Downloader, PARAMS
+    from .util import get_default_destination_dir, init_logs
+except ImportError:
+    from downloader import Downloader, PARAMS
+    from util import get_default_destination_dir, init_logs
 
 class ServiceExit(Exception):
     """
