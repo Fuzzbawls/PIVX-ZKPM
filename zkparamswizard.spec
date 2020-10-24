@@ -52,6 +52,7 @@ exe = EXE(pyz,
 if os_type == 'darwin':
     app = BUNDLE(exe,
                  name='%s.app' % app_name,
+                 icon=os.path.join(base_dir, 'img', 'zkpm.icns'),
                  bundle_identifier=None,
                      info_plist={
                         'NSHighResolutionCapable': 'True'
@@ -73,7 +74,9 @@ if os_type == 'win32':
     os.system('\"c:\\program files (x86)\\NSIS\\makensis.exe\" %s' % os.path.join(base_dir, 'setup.nsi'))
 
 elif os_type == 'linux':
+    os.chdir(base_dir)
     dist_name = app_name + '-v' + version_str + '-gnu_linux'
+    # Rename dist Dir
     dist_path_linux = os.path.join(base_dir, dist_name)
     os.rename(dist_path, dist_path_linux)
     # Compress dist Dir
@@ -81,11 +84,13 @@ elif os_type == 'linux':
     os.system('tar -zcvf %s -C %s %s' % (dist_name + '.tar.gz', base_dir, dist_name))
 
 elif os_type == 'darwin':
+    os.chdir(base_dir)
     dist_name = app_name + '-v' + version_str + '-MacOSX'
+    # Rename dist Dir
     dist_path_mac = os.path.join(base_dir, dist_name)
     os.rename(dist_path, dist_path_mac)
     # Remove 'app' folder
-    print("Removin 'app' folder")
+    print("Removing 'app' folder")
     os.chdir(dist_path_mac)
     os.system('rm -rf app')
     os.chdir(base_dir)
