@@ -24,7 +24,6 @@ def run():
         print("Running live")
         sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
         imgDir = os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.join(__file__, os.pardir), os.pardir), os.pardir), 'img'))
-        print(imgDir)
 
     # Create App and main window
     from PyQt5.QtWidgets import QApplication

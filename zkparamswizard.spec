@@ -26,7 +26,7 @@ if os_type == 'win32':
 a = Analysis(['src/ZkParamsWizard/zkparamswizard.py'],
              pathex=[base_dir, 'src/ZkParamsWizard'],
              binaries=[],
-             datas=[],
+             datas=add_files,
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
