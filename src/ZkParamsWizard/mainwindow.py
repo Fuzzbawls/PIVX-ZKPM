@@ -7,7 +7,7 @@
 import os
 import signal
 from PyQt5.QtCore import Qt, QThread
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import (
     QApplication,
     QFileDialog,
@@ -183,7 +183,7 @@ class MainWidget(QWidget):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, app, version):
+    def __init__(self, app, version, imgDir):
         super().__init__()
         self.app = app
         self.version = version
@@ -194,13 +194,15 @@ class MainWindow(QMainWindow):
         signal.signal(signal.SIGINT, service_shutdown)
 
         # Initialize user interface
-        self.initUI()
+        self.initUI(imgDir)
         self.main_widget = MainWidget(self)
         self.setCentralWidget(self.main_widget)
         self.show()
         self.activateWindow()
 
-    def initUI(self):
+    def initUI(self, imgDir):
         # Set title and geometry
         self.setWindowTitle(self.title)
         self.resize(500, 180)
+        # Set window icon
+        self.setWindowIcon(QIcon(os.path.join(imgDir, 'zkpw.png')))

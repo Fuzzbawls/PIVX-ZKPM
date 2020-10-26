@@ -10,11 +10,12 @@ import os
 APP_VERSION = "0.0.1"     # !TODO: move to version file
 
 
-def set_src_dir():
+def run():
     if getattr(sys, 'frozen', False):
         print("Running in a bundle")
         # running in a bundle
         sys.path.append(os.path.join(sys._MEIPASS, 'src'))
+        imgDir = os.path.join(sys._MEIPASS, 'img')
         # if linux export qt plugins path
         if sys.platform == 'linux':
             os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = os.path.join(sys._MEIPASS, 'PyQt5', 'Qt', 'plugins')
@@ -22,10 +23,8 @@ def set_src_dir():
         # running live
         print("Running live")
         sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
-
-
-def run():
-    set_src_dir()
+        imgDir = os.path.abspath(os.path.join(os.path.join(os.path.join(os.path.join(__file__, os.pardir), os.pardir), os.pardir), 'img'))
+        print(imgDir)
 
     # Create App and main window
     from PyQt5.QtWidgets import QApplication
@@ -34,7 +33,7 @@ def run():
     except ImportError:
         from mainwindow import MainWindow
     app = QApplication(sys.argv)
-    ex = MainWindow(app, APP_VERSION)
+    ex = MainWindow(app, APP_VERSION, imgDir)
 
     # Execute App
     app.exec_()
